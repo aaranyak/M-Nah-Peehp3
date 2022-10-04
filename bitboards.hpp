@@ -29,7 +29,7 @@ public:
     }
     BitBoard boardState; // The board state.
     void initBoardState(char initState[64]) {
-        for (size_t i = 0; i < 64; i++)
+        for (size_t i = 64; i > 0; i--)
         {
             this->boardState.bPawns <<= 1;
             this->boardState.wPawns <<= 1;
@@ -44,40 +44,40 @@ public:
             this->boardState.bQueens <<= 1;
             this->boardState.wQueens <<= 1;
             
-            if (initState[i] == 'p') {
+            if (initState[i-1] == 'p') {
                this->boardState.bPawns |= 1;
             }
-            if (initState[i] == 'P') {
+            if (initState[i-1] == 'P') {
                this->boardState.wPawns |= 1;
             }
-            if (initState[i] == 'r') {
+            if (initState[i-1] == 'r') {
                this->boardState.bRooks |= 1;
             }
-            if (initState[i] == 'R') {
+            if (initState[i-1] == 'R') {
                this->boardState.wRooks |= 1;
             }
-            if (initState[i] == 'n') {
+            if (initState[i-1] == 'n') {
                this->boardState.bKnights |= 1;
             }
-            if (initState[i] == 'N') {
+            if (initState[i-1] == 'N') {
                this->boardState.wKnights |= 1;
             }
-            if (initState[i] == 'k') {
+            if (initState[i-1] == 'k') {
                this->boardState.bKing |= 1;
             }
-            if (initState[i] == 'K') {
+            if (initState[i-1] == 'K') {
                this->boardState.wKing |= 1;
             }
-            if (initState[i] == 'q') {
+            if (initState[i-1] == 'q') {
                this->boardState.bQueens |= 1;
             }
-            if (initState[i] == 'Q') {
+            if (initState[i-1] == 'Q') {
                this->boardState.wQueens |= 1;
             }
-            if (initState[i] == 'b') {
+            if (initState[i-1] == 'b') {
                this->boardState.bBishops |= 1;
             }
-            if (initState[i] == 'B') {
+            if (initState[i-1] == 'B') {
                this->boardState.wBishops |= 1;
             }
         }

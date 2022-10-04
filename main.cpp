@@ -18,8 +18,5 @@ int main(int argc, char *argv[])
     };
     Board board;
     board.initBoardState(boardInitState);
-    
-
-    3
-    
+    generateKnightMoves(board.boardState, true);
 }
