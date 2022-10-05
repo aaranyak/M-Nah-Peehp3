@@ -1,6 +1,7 @@
 #include "bitboards.hpp"
 #include <assert.h>
 void renderBoard(Board board) {
+    // Prints out a simple representation of the board.
     BitBoard boardState = board.boardState;
     std::cout << "+---+---+---+---+---+---+---+---+\n";
     for (size_t y = 0; y < 8; y++)
@@ -61,6 +62,7 @@ void renderBoard(Board board) {
 }
 
 U64 getTeamMask(BitBoard board, bool team) {
+    // Returns a mask of all the pieces in a team.
     U64 mask = 0;
     if (team) {
         mask = board.wPawns | board.wRooks | board.wKnights | board.wBishops | board.wKing | board.wQueens;
@@ -80,7 +82,7 @@ const int bitScanIndex64[64] = {
    25, 39, 14, 33, 19, 30,  9, 24,
    13, 18,  8, 12,  7,  6,  5, 63
 };
-int bitScanForward(U64 bb) {
+int bitScanForward(U64 bb) { /* Returns the index of the least significant bit */
    const U64 debruijn64 = 0x03f79d71b4cb0a89;
    assert(bb != 0);
    return bitScanIndex64[((bb ^ (bb-1)) * debruijn64) >> 58];

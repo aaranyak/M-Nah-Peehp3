@@ -25,10 +25,10 @@ class Board
 {
 public:
     Board() {
-        // Class Constructor.
     }
     BitBoard boardState; // The board state.
     void initBoardState(char initState[64]) {
+      // Initializes the state of the board from an array of chars.
         for (size_t i = 64; i > 0; i--)
         {
             this->boardState.bPawns <<= 1;

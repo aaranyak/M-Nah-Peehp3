@@ -65,3 +65,7 @@ U64 knightMaskLookup[64] = {
     38368557762871296,
     4679521487814656,
 };
+
+U64 getKnightMask(int index) {
+    return knightMaskLookup[index];
+}
