@@ -18,5 +18,7 @@ int main(int argc, char *argv[])
     };
     Board board;
     board.initBoardState(boardInitState);
-    generateKnightMoves(board.boardState, true);
+    vector<BitBoard> moves = generateKnightMoves(board.boardState, true);
+    board.boardState = moves[0];
+    renderBoard(board);
 }

@@ -85,3 +85,37 @@ public:
     }
 };
 
+void checkForAttacks(BitBoard *board, U64 position, bool team) {
+   if (team) {
+      board->bPawns &= ~position;
+      board->bRooks &= ~position;
+      board->bKnights &= ~position;
+      board->bBishops &= ~position;
+      board->bQueens &= ~position;
+   }
+   else {
+      board->wPawns &= ~position;
+      board->wRooks &= ~position;
+      board->wKnights &= ~position;
+      board->wBishops &= ~position;
+      board->wQueens &= ~position;
+   }
+}
+
+void copyBitBoard(BitBoard *out, BitBoard board) {
+   // Deepcopies the bitboard
+   out->wPawns = board.wPawns;
+   out->wRooks = board.wRooks;
+   out->wKnights = board.wKnights;
+   out->wBishops = board.wBishops;
+   out->wQueens = board.wQueens;
+   out->wKing = board.wKing;
+   // Black piece bitboards.
+   out->bPawns = board.bPawns;
+   out->bRooks = board.bRooks;
+   out->bKnights = board.bKnights;
+   out->bBishops = board.bBishops;
+   out->bQueens = board.bQueens;
+   out->bKing = board.bKing;
+   // Castling Eligibility
+}
