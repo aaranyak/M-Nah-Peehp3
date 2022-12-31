@@ -3,11 +3,11 @@
 void renderBoard(Board board) {
     // Prints out a simple representation of the board.
     BitBoard boardState = board.boardState;
-    std::cout << "+---+---+---+---+---+---+---+---+\n";
+    std::cout << "    h   g   f   e   d   c   b   a\n";
+    std::cout << "  +---+---+---+---+---+---+---+---+\n";
     for (size_t y = 0; y < 8; y++)
     {
-        std::cout << "|   |   |   |   |   |   |   |   |\n";
-        std::cout << "|";
+        std::cout << y + 1 << " |";
         for (size_t x = 0; x < 8; x++)
         {
             char letter;
@@ -56,8 +56,7 @@ void renderBoard(Board board) {
             std::cout << " " << letter << " |";
         }
         std::cout << "\n";
-        std::cout << "|   |   |   |   |   |   |   |   |\n";
-        std::cout << "+---+---+---+---+---+---+---+---+\n";
+        std::cout << "  +---+---+---+---+---+---+---+---+\n";
     }
 }
 
@@ -86,4 +85,70 @@ int bitScanForward(U64 bb) { /* Returns the index of the least significant bit *
    const U64 debruijn64 = 0x03f79d71b4cb0a89;
    assert(bb != 0);
    return bitScanIndex64[((bb ^ (bb-1)) * debruijn64) >> 58];
+}
+
+BitBoard playMoveOnBoardByIndex(BitBoard *board, int start, int end) {
+    int startP = (U64)1 << start;
+    int endP = (U64)1 << end;
+    checkForAttacks(board, endP, getTeamMask(*board, true) & startP);
+    if (startP & board->wPawns) {
+        board->wPawns ^= (endP | startP);
+    }
+    if (startP & board->wRooks) {
+        board->wRooks ^= (endP | startP);
+    }
+    if (startP & board->wKnights) {
+        board->wKnights ^= (endP | startP);
+    }
+    if (startP & board->wBishops) {
+        board->wBishops ^= (endP | startP);        
+    }
+    if (startP & board->wQueens) {
+        board->wQueens ^= (endP | startP);        
+    }
+    if (startP & board->wKing) {
+        board->wKing ^= (endP | startP);        
+    }
+
+    if (startP & board->bPawns) {
+        board->bPawns ^= (endP | startP);
+    }
+    if (startP & board->bRooks) {
+        board->bRooks ^= (endP | startP);
+    }
+    if (startP & board->bKnights) {
+        board->bKnights ^= (endP | startP);
+    }
+    if (startP & board->bBishops) {
+        board->bBishops ^= (endP | startP);        
+    }
+    if (startP & board->bQueens) {
+        board->bQueens ^= (endP | startP);        
+    }
+    if (startP & board->bKing) {
+        board->bKing ^= (endP | startP);        
+    }
+}
+
+void renderBitBoard(U64 bitBoard) {
+    // Prints out a simple representation of the board.
+    std::cout << "    h   g   f   e   d   c   b   a\n";
+    std::cout << "  +---+---+---+---+---+---+---+---+\n";
+    for (size_t y = 0; y < 8; y++)
+    {
+        std::cout << y + 1 << " |";
+        for (size_t x = 0; x < 8; x++)
+        {
+            char letter = ' ';
+            U64 position = 0;
+            position |= 1;
+            position <<= ((8 * y) + x);
+            if (position & bitBoard) {
+                letter = '1';
+            }
+            std::cout << " " << letter << " |";
+        }
+        std::cout << "\n";
+        std::cout << "  +---+---+---+---+---+---+---+---+\n";
+    }
 }

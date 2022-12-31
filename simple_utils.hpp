@@ -22,3 +22,33 @@ string printAsBin(long n)
   }
   return retval;
 }
+
+int getFileFromCN(char file) {
+  if (file == 'a') {
+    return 0;
+  }
+  if (file == 'b') {
+    return 1;
+  }
+  if (file == 'c') {
+    return 2;
+  }
+  if (file == 'd') {
+    return 3;
+  }
+  if (file == 'e') {
+    return 4;
+  }
+  if (file == 'f') {
+    return 5;
+  }
+  if (file == 'g') {
+    return 6;
+  }
+  if (file == 'h') {
+    return 7;
+  }
+  else {
+    return -1;
+  }
+}
