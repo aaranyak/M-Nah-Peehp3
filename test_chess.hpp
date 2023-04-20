@@ -6,8 +6,8 @@
 int Search(int depth, BitBoard board, bool team) {
     if (depth) {
         int count = 0;
-        vector<BitBoard> moves = generate_moves(board, team);
-        for (auto &&moves : bitboard)
+        vector<BitBoard> moves = generateMoves(board, team);
+        for (auto &&bitboard : moves)
         {
             count += Search(depth - 1, bitboard, !team);
         }

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "generate_moves.hpp"
+#include "test_chess.hpp"
 #include <chrono>
 #include <vector>
 using namespace std::chrono;
@@ -18,13 +18,7 @@ int main(int argc, char *argv[])
     };
     Board board;
     board.initBoardState(boardInitState);
-    vector<BitBoard> moves = generatePawnMoves(board.boardState, false);
-    for (size_t i = 0; i < moves.size(); i++)
-    {
-        board.boardState = moves[i];
-        renderBoard(board);
-        printf("\n\n");
-    }
-    std::cout << moves.size() << endl;
-    return 0;
+    int count = 0;
+    count = Search(6, board.boardState, true);
+    std::cout << count << endl;
 }
