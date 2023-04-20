@@ -92,6 +92,52 @@ vector<BitBoard> generateKingMoves(BitBoard board, bool team) {
     }
     return retVal; /* Return the generated moves */
 }
+
+vector<BitBoard> pawnPromotion(BitBoard board, bool team, U64 piece) {
+    // Generate Pawn Promotion Moves
+    BitBoard queenBoard; /* Board for promoting to queen */
+    BitBoard rookBoard; /* Board for promoting rook*/
+    BitBoard bishopBoard; /* Board for promoting bishop*/
+    BitBoard knightBoard; /* Board for promoting knight*/
+    // Copy board data to bitboard
+    copyBitBoard(&queenBoard, board);
+    copyBitBoard(&rookBoard, board);
+    copyBitBoard(&bishopBoard, board);
+    copyBitBoard(&knightBoard, board);
+    // If white is playing
+    if (team) {
+        // Promote Queen
+        queenBoard.wPawns &= ~piece; /* Remove Pawn */
+        queenBoard.wQueens |= piece; /* Add Queen */
+        // Promote Rook
+        rookBoard.wPawns &= ~piece; /* Remove Pawn */
+        rookBoard.wRooks |= piece; /* Add Rook */
+        // Promote Bishop
+        bishopBoard.wPawns &= ~piece; /* Remove Pawn */
+        bishopBoard.wBishops |= piece; /* Add Bishop */
+        // Promote Knight
+        knightBoard.wPawns &= ~piece; /* Remove Pawn */
+        knightBoard.wKnights |= piece; /* Add Knight */
+    }
+    // If black is playing
+    else {
+        // Promote Queen
+        queenBoard.bPawns &= ~piece; /* Remove Pawn */
+        queenBoard.bQueens |= piece; /* Add Queen */
+        // Promote Rook
+        rookBoard.bPawns &= ~piece; /* Remove Pawn */
+        rookBoard.bRooks |= piece; /* Add Rook */
+        // Promote Bishop
+        bishopBoard.bPawns &= ~piece; /* Remove Pawn */
+        bishopBoard.bBishops |= piece; /* Add Bishop */
+        // Promote Knight
+        knightBoard.bPawns &= ~piece; /* Remove Pawn */
+        knightBoard.bKnights |= piece; /* Add Knight */
+    }
+    vector<BitBoard> promotions = {queenBoard, rookBoard, bishopBoard, knightBoard};
+    return promotions;
+}
+
 vector<BitBoard> generatePawnMoves(BitBoard board, bool team) {
     // Generates all the resulting board states by moving the pawns.
     U64 ownTeamMask = getTeamMask(board, team); /* Our own team mask*/
@@ -103,8 +149,8 @@ vector<BitBoard> generatePawnMoves(BitBoard board, bool team) {
         {
             U64 isolatedLSB = lastValue & -lastValue; /* Isolate the least significant bit */
             U64 pawnMoves = 0; /* Moves to play */
+
             // Add the pawn pattern to the moves to play
-// Add the pawn pattern to the moves to play
             pawnMoves |= (isolatedLSB << 8) /* Pawn moves forward*/
                 & ~(ownTeamMask | opponentTeamMask); /* Check if square is blocked by any team */
             pawnMoves |= ((isolatedLSB << 16) & ranksLookup[24]) /* Double pawn push if pawn not yet moved*/
@@ -122,10 +168,19 @@ vector<BitBoard> generatePawnMoves(BitBoard board, bool team) {
                 pawnMoves &= ~move; /* Update the remaining moves */
             }
             lastValue &= ~isolatedLSB; /* Update remaining pieces */
+            // Check for pawn promotion
+            U64 forward_move = (isolatedLSB << 8) & ~(ownTeamMask | opponentTeamMask); /* Pawn Forward Move */
+            if (forward_move & ranksLookup[57]) { /* If pawn is on last square */
+                BitBoard movedPawn; /* Create new board */
+                copyBitBoard(&movedPawn, board); /* Copy data to new board */
+                movedPawn.wPawns ^= forward_move | isolatedLSB; /* Move Pawn */
+                vector<BitBoard> pawnPromotions = pawnPromotion(movedPawn, team, forward_move); /* Create Promotion Options */
+                retVal.insert(retVal.end(), pawnPromotions.begin(), pawnPromotions.end()); /* Add them to list */
+            }
         }
         
     }
-    if (!team) { /* By moving the black pawns */
+    else { /* By moving the black pawns */
         U64 lastValue = board.bPawns; /* The remaining bits to be scanned */
         while (lastValue) /* While there are bits still remaining*/
         {
@@ -151,11 +206,21 @@ vector<BitBoard> generatePawnMoves(BitBoard board, bool team) {
                 pawnMoves &= ~move; /* Update the remaining moves */
             }
             lastValue &= ~isolatedLSB; /* Update remaining pieces */
+            // Check for pawn promotion
+            U64 forward_move = (isolatedLSB >> 8) & ~(ownTeamMask | opponentTeamMask); /* Pawn Forward Move */
+            if (forward_move & ranksLookup[0]) { /* If pawn is on last square */
+                BitBoard movedPawn; /* Create new board */
+                copyBitBoard(&movedPawn, board); /* Copy data to new board */
+                movedPawn.bPawns ^= forward_move | isolatedLSB; /* Move Pawn */
+                vector<BitBoard> pawnPromotions = pawnPromotion(movedPawn, team, forward_move); /* Create Promotion Options */
+                retVal.insert(retVal.end(), pawnPromotions.begin(), pawnPromotions.end()); /* Add them to list */
+            }
         }
         
     }
     return retVal;
 }
+
 vector<BitBoard> generateMoves(BitBoard board, bool team) {
     // Generates all the possible resulting board states from a current board state.
     vector<BitBoard> moves {};
