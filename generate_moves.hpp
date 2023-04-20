@@ -56,16 +56,16 @@ vector<BitBoard> generateKingMoves(BitBoard board, bool team) {
         while (lastValue) { /* While there are still bits remaining */
             U64 isolatedLSB = lastValue & -lastValue; /* Isolate the least significant bit */
             int kingPosition = bitScanForward(isolatedLSB); /* Get the index of the least significant bit */
-            U64 kingMoves = getKingMask(kingPosition); /* Get the pattern of moves for the king */
-            kingMoves &= ~ownTeamMask; /* Remove the blocked squares from the mask */
-            while (kingMoves) { /* While there are moves left */
-                U64 move = kingMoves & -kingMoves; /* Isolate next move */
+            U64 pawnMoves = getKingMask(kingPosition); /* Get the pattern of moves for the king */
+            pawnMoves &= ~ownTeamMask; /* Remove the blocked squares from the mask */
+            while (pawnMoves) { /* While there are moves left */
+                U64 move = pawnMoves & -pawnMoves; /* Isolate next move */
                 BitBoard newBoard; /* Create the new board */
                 copyBitBoard(&newBoard, board); /* Make the bitboard same as the board */
                 newBoard.wKing ^= move | isolatedLSB; /* Move the king */
                 checkForAttacks(&newBoard, move, team); /* Check for captures */
                 retVal.push_back(newBoard); /* Add the new board to list */
-                kingMoves &= ~move; /* Update the remaining moves */
+                pawnMoves &= ~move; /* Update the remaining moves */
             }
         lastValue &= ~isolatedLSB; /* Update the remaining pieces */
         }
@@ -76,16 +76,16 @@ vector<BitBoard> generateKingMoves(BitBoard board, bool team) {
         while (lastValue) { /* While there are still bits remaining */
             U64 isolatedLSB = lastValue & -lastValue; /* Isolate the least significant bit */
             int kingPosition = bitScanForward(isolatedLSB); /* Get the index of the least significant bit */
-            U64 kingMoves = getKingMask(kingPosition); /* Get the pattern of moves for the king */
-            kingMoves &= ~ownTeamMask; /* Remove the blocked squares from the mask */
-            while (kingMoves) { /* While there are moves left */
-                U64 move = kingMoves & -kingMoves; /* Isolate next move */
+            U64 pawnMoves = getKingMask(kingPosition); /* Get the pattern of moves for the king */
+            pawnMoves &= ~ownTeamMask; /* Remove the blocked squares from the mask */
+            while (pawnMoves) { /* While there are moves left */
+                U64 move = pawnMoves & -pawnMoves; /* Isolate next move */
                 BitBoard newBoard; /* Create the new board */
                 copyBitBoard(&newBoard, board);
                 newBoard.bKing ^= move | isolatedLSB;
                 checkForAttacks(&newBoard, move, team); /* Check for captures */
                 retVal.push_back(newBoard); /* Add the new board to list */
-                kingMoves &= ~move; /* Update the remaining moves */
+                pawnMoves &= ~move; /* Update the remaining moves */
             }
         lastValue &= ~isolatedLSB; /* Update the remaining pieces */
         }
@@ -94,24 +94,75 @@ vector<BitBoard> generateKingMoves(BitBoard board, bool team) {
 }
 vector<BitBoard> generatePawnMoves(BitBoard board, bool team) {
     // Generates all the resulting board states by moving the pawns.
-    U64 ownTeamMask = getTeamMask(team); /* Our own team mask*/
-    U64 opponentTeamMask = getTeamMask(!team); /* The opponent team's mask */
-    vector<BitBoard> retVal = {};
+    U64 ownTeamMask = getTeamMask(board, team); /* Our own team mask*/
+    U64 opponentTeamMask = getTeamMask(board, !team); /* The opponent team's mask */
+    vector<BitBoard> retVal  {};
     if (team) { /* By moving the white pawns */
         U64 lastValue = board.wPawns; /* The remaining bits to be scanned */
         while (lastValue) /* While there are bits still remaining*/
         {
             U64 isolatedLSB = lastValue & -lastValue; /* Isolate the least significant bit */
+            U64 pawnMoves = 0; /* Moves to play */
+            // Add the pawn pattern to the moves to play
+// Add the pawn pattern to the moves to play
+            pawnMoves |= (isolatedLSB << 8) /* Pawn moves forward*/
+                & ~(ownTeamMask | opponentTeamMask); /* Check if square is blocked by any team */
+            pawnMoves |= ((isolatedLSB << 16) & ranksLookup[24]) /* Double pawn push if pawn not yet moved*/
+                & ~(ownTeamMask | opponentTeamMask) /* If square is not blocked*/
+                & ~((ownTeamMask | opponentTeamMask) << 8); /* Make sure pawn cannot jump over other piece */
+            pawnMoves |= ((isolatedLSB << 9) & ~filesLookup[0]) & opponentTeamMask; /* Check for attacks */
+            pawnMoves |= ((isolatedLSB << 7) & ~filesLookup[7]) & opponentTeamMask; /* Check for attacks */
+            while (pawnMoves) { /* While there are moves left */
+                U64 move = pawnMoves & -pawnMoves; /* Isolate next move */
+                BitBoard newBoard; /* Create the new board */
+                copyBitBoard(&newBoard, board);
+                newBoard.wPawns ^= move | isolatedLSB;
+                checkForAttacks(&newBoard, move, team); /* Check for captures */
+                retVal.push_back(newBoard); /* Add the new board to list */
+                pawnMoves &= ~move; /* Update the remaining moves */
+            }
+            lastValue &= ~isolatedLSB; /* Update remaining pieces */
         }
         
     }
+    if (!team) { /* By moving the black pawns */
+        U64 lastValue = board.bPawns; /* The remaining bits to be scanned */
+        while (lastValue) /* While there are bits still remaining*/
+        {
+            U64 isolatedLSB = lastValue & -lastValue; /* Isolate the least significant bit */
+            U64 pawnMoves = 0; /* Moves to play */
+
+            // Add the pawn pattern to the moves to play
+            pawnMoves |= (isolatedLSB >> 8) /* Pawn moves forward*/
+                & ~(ownTeamMask | opponentTeamMask); /* Check if square is blocked by any team */
+            pawnMoves |= ((isolatedLSB >> 16) & ranksLookup[32]) /* Double pawn push if pawn not yet moved*/
+                & ~(ownTeamMask | opponentTeamMask) /* If square is not blocked*/
+                & ~((ownTeamMask | opponentTeamMask) >> 8); /* Make sure pawn cannot jump over other piece */
+            pawnMoves |= ((isolatedLSB >> 9) & ~filesLookup[0]) & opponentTeamMask; /* Check for attacks */
+            pawnMoves |= ((isolatedLSB >> 7) & ~filesLookup[7]) & opponentTeamMask; /* Check for attacks */
+            
+            while (pawnMoves) { /* While there are moves left */
+                U64 move = pawnMoves & -pawnMoves; /* Isolate next move */
+                BitBoard newBoard; /* Create the new board */
+                copyBitBoard(&newBoard, board);
+                newBoard.bPawns ^= move | isolatedLSB;
+                checkForAttacks(&newBoard, move, team); /* Check for captures */
+                retVal.push_back(newBoard); /* Add the new board to list */
+                pawnMoves &= ~move; /* Update the remaining moves */
+            }
+            lastValue &= ~isolatedLSB; /* Update remaining pieces */
+        }
+        
+    }
+    return retVal;
 }
 vector<BitBoard> generateMoves(BitBoard board, bool team) {
     // Generates all the possible resulting board states from a current board state.
     vector<BitBoard> moves {};
     vector<BitBoard> knightMoves = generateKnightMoves(board, team);
     vector<BitBoard> kingMoves = generateKingMoves(board, team);
+    vector<BitBoard> pawnMoves = generatePawnMoves(board, team);
     moves.insert(moves.end(), knightMoves.begin(), knightMoves.end());
-    moves.insert(moves.end(), kingMoves.begin(), kingMoves.end());
+    moves.insert(moves.end(), pawnMoves.begin(), pawnMoves.end());
     return moves;
 }
