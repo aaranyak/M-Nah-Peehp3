@@ -1,6 +1,6 @@
 #include "files_and_ranks.hpp"
 
-U64 knightMaskLookup[64] = {
+const U64 knightMaskLookup[64] = {
     132096,
     329728,
     659712,
@@ -71,7 +71,7 @@ U64 getKnightMask(int index) {
     return knightMaskLookup[index];
 }
 
-U64 kingMaskLookup[64] = {
+const U64 kingMaskLookup[64] = {
     770,
     1797,
     3594,

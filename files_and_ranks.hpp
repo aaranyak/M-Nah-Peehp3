@@ -1,5 +1,5 @@
 #include "utilfuncs.hpp"
-U64 filesLookup[64] = {
+const U64 filesLookup[64] = {
     72340172838076673,
     144680345676153346,
     289360691352306692,
@@ -66,7 +66,7 @@ U64 filesLookup[64] = {
     9259542123273814144,
 };
 
-U64 ranksLookup[64] = {
+const U64 ranksLookup[64] = {
     255,
     255,
     255,

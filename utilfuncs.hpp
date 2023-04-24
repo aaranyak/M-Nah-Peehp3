@@ -131,7 +131,7 @@ BitBoard playMoveOnBoardByIndex(BitBoard *board, int start, int end) {
 }
 
 void renderBitBoard(U64 bitBoard) {
-    // Prints out a simple representation of the board.
+    // Prints out a simple representation of the U64 int.
     std::cout << "    h   g   f   e   d   c   b   a\n";
     std::cout << "  +---+---+---+---+---+---+---+---+\n";
     for (size_t y = 0; y < 8; y++)
@@ -147,6 +147,24 @@ void renderBitBoard(U64 bitBoard) {
                 letter = '1';
             }
             std::cout << " " << letter << " |";
+        }
+        std::cout << "\n";
+        std::cout << "  +---+---+---+---+---+---+---+---+\n";
+    }
+}
+
+void renderBoardArray(auto array[64]) {
+    // Prints out a simple representation of an array..
+    std::cout << "    h   g   f   e   d   c   b   a\n";
+    std::cout << "  +---+---+---+---+---+---+---+---+\n";
+    for (size_t y = 0; y < 8; y++)
+    {
+        std::cout << y + 1 << " |";
+        for (size_t x = 0; x < 8; x++)
+        {
+            int position = 0;
+            position = ((8 * y) + x);
+            std::cout << " " << array[position] << " |";
         }
         std::cout << "\n";
         std::cout << "  +---+---+---+---+---+---+---+---+\n";

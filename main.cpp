@@ -3,12 +3,11 @@
 #include <chrono>
 #include <vector>
 using namespace std::chrono;
-
 int main(int argc, char *argv[])
 {
     char boardInitState[64]  = {    
-        ' ','N','B','K','Q','B','N','R',
-        'p','P','P','P','P','P','P','P',
+        'R','N','B','K','Q','B','N','R',
+        ' ','P','P','P','P','P','P','P',
         ' ',' ',' ',' ',' ',' ',' ',' ',
         ' ',' ',' ',' ',' ',' ',' ',' ',
         ' ',' ',' ',' ',' ',' ',' ',' ',
@@ -18,7 +17,9 @@ int main(int argc, char *argv[])
     };
     Board board;
     board.initBoardState(boardInitState);
-    int count = 0;
-    count = Search(6, board.boardState, true);
-    std::cout << count << endl;
+    initRookDB();
+    system("clear");
+    vector<BitBoard> moves = generateRookMoves(board.boardState, true);
+    std::cout << moves.size() << endl;
+    deleteRookDB();
 }

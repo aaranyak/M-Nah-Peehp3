@@ -1,5 +1,5 @@
 #include <vector>
-#include "jumping_piece_moves.hpp"
+#include "magic_bitboards.hpp"
 using namespace std;
 vector<BitBoard> generateKnightMoves(BitBoard board, bool team) {
     // Generates all the resulting board states by moving the knight.
@@ -56,16 +56,16 @@ vector<BitBoard> generateKingMoves(BitBoard board, bool team) {
         while (lastValue) { /* While there are still bits remaining */
             U64 isolatedLSB = lastValue & -lastValue; /* Isolate the least significant bit */
             int kingPosition = bitScanForward(isolatedLSB); /* Get the index of the least significant bit */
-            U64 pawnMoves = getKingMask(kingPosition); /* Get the pattern of moves for the king */
-            pawnMoves &= ~ownTeamMask; /* Remove the blocked squares from the mask */
-            while (pawnMoves) { /* While there are moves left */
-                U64 move = pawnMoves & -pawnMoves; /* Isolate next move */
+            U64 kingMoves = getKingMask(kingPosition); /* Get the pattern of moves for the king */
+            kingMoves &= ~ownTeamMask; /* Remove the blocked squares from the mask */
+            while (kingMoves) { /* While there are moves left */
+                U64 move = kingMoves & -kingMoves; /* Isolate next move */
                 BitBoard newBoard; /* Create the new board */
                 copyBitBoard(&newBoard, board); /* Make the bitboard same as the board */
                 newBoard.wKing ^= move | isolatedLSB; /* Move the king */
                 checkForAttacks(&newBoard, move, team); /* Check for captures */
                 retVal.push_back(newBoard); /* Add the new board to list */
-                pawnMoves &= ~move; /* Update the remaining moves */
+                kingMoves &= ~move; /* Update the remaining moves */
             }
         lastValue &= ~isolatedLSB; /* Update the remaining pieces */
         }
@@ -76,16 +76,16 @@ vector<BitBoard> generateKingMoves(BitBoard board, bool team) {
         while (lastValue) { /* While there are still bits remaining */
             U64 isolatedLSB = lastValue & -lastValue; /* Isolate the least significant bit */
             int kingPosition = bitScanForward(isolatedLSB); /* Get the index of the least significant bit */
-            U64 pawnMoves = getKingMask(kingPosition); /* Get the pattern of moves for the king */
-            pawnMoves &= ~ownTeamMask; /* Remove the blocked squares from the mask */
-            while (pawnMoves) { /* While there are moves left */
-                U64 move = pawnMoves & -pawnMoves; /* Isolate next move */
+            U64 kingMoves = getKingMask(kingPosition); /* Get the pattern of moves for the king */
+            kingMoves &= ~ownTeamMask; /* Remove the blocked squares from the mask */
+            while (kingMoves) { /* While there are moves left */
+                U64 move = kingMoves & -kingMoves; /* Isolate next move */
                 BitBoard newBoard; /* Create the new board */
                 copyBitBoard(&newBoard, board);
                 newBoard.bKing ^= move | isolatedLSB;
                 checkForAttacks(&newBoard, move, team); /* Check for captures */
                 retVal.push_back(newBoard); /* Add the new board to list */
-                pawnMoves &= ~move; /* Update the remaining moves */
+                kingMoves &= ~move; /* Update the remaining moves */
             }
         lastValue &= ~isolatedLSB; /* Update the remaining pieces */
         }
@@ -220,6 +220,51 @@ vector<BitBoard> generatePawnMoves(BitBoard board, bool team) {
     }
     return retVal;
 }
+vector<BitBoard> generateRookMoves(BitBoard board, bool team) {
+    // Generates all the resulting board states by moving rooks.
+    vector<BitBoard> retVal  {};
+    if (team) { /* by moving the white rook */
+        U64 ownTeamMask = getTeamMask(board, team); /* Our Own Team mask */
+        U64 opponentTeamMask = getTeamMask(board, !team); /* The Opponent Team mask */        
+        U64 lastValue = board.wRooks; /* The remaining bits to be scanned */
+        while (lastValue) { /* While there are still bits remaining */
+            U64 isolatedLSB = lastValue & -lastValue; /* Isolate the least significant bit */
+            int rookPosition = bitScanForward(isolatedLSB); /* Get the index of the least significant bit */
+            U64 moves = getRookMoves(rookPosition, ownTeamMask, opponentTeamMask); /* Get the rook attacks from the magic bitboard table */
+            while (moves) { /* Loop through all the rook moves */
+                U64 move = moves & -moves; /* Isolate the least significant bit */
+                BitBoard newBoard; /* New board position for this move */
+                copyBitBoard(&newBoard, board); /* Copy the old board position */
+                newBoard.wRooks ^= move | isolatedLSB; /* Move the rook to new position */
+                checkForAttacks(&newBoard, move, team); /* Capture piece on square if any */
+                retVal.push_back(newBoard); /* Add move to return list */
+                moves &= ~move; /* Reset LSB */
+            }
+        lastValue &= ~isolatedLSB; /* Update the remaining pieces */
+        }
+    }
+    else { /* By moving the white rook */
+        U64 ownTeamMask = getTeamMask(board, team); /* Our Own Team mask */
+        U64 opponentTeamMask = getTeamMask(board, !team); /* The Opponent Team mask */        
+        U64 lastValue = board.bRooks; /* The remaining bits to be scanned */
+        while (lastValue) { /* While there are still bits remaining */
+            U64 isolatedLSB = lastValue & -lastValue; /* Isolate the least significant bit */
+            int rookPosition = bitScanForward(isolatedLSB); /* Get the index of the least significant bit */
+            U64 moves = getRookMoves(rookPosition, ownTeamMask, opponentTeamMask); /* Get the rook attacks from the magic bitboard table */
+            while (moves) { /* Loop through all the rook moves */
+                U64 move = moves & -moves; /* Isolate the least significant bit */
+                BitBoard newBoard; /* New board position for this move */
+                copyBitBoard(&newBoard, board); /* Copy the old board position */
+                newBoard.bRooks ^= move | isolatedLSB; /* Move the rook to new position */
+                checkForAttacks(&newBoard, move, team); /* Capture piece on square if any */
+                retVal.push_back(newBoard); /* Add move to return list */
+                moves &= ~move; /* Reset LSB */
+            }
+        lastValue &= ~isolatedLSB; /* Update the remaining pieces */
+        }
+    }
+    return retVal; /* Return the generated moves */
+}
 
 vector<BitBoard> generateMoves(BitBoard board, bool team) {
     // Generates all the possible resulting board states from a current board state.
@@ -227,7 +272,10 @@ vector<BitBoard> generateMoves(BitBoard board, bool team) {
     vector<BitBoard> knightMoves = generateKnightMoves(board, team);
     vector<BitBoard> kingMoves = generateKingMoves(board, team);
     vector<BitBoard> pawnMoves = generatePawnMoves(board, team);
+    vector<BitBoard> rookMoves = generateRookMoves(board, team);
     moves.insert(moves.end(), knightMoves.begin(), knightMoves.end());
+    moves.insert(moves.end(), kingMoves.begin(), kingMoves.end());
     moves.insert(moves.end(), pawnMoves.begin(), pawnMoves.end());
+    moves.insert(moves.end(), rookMoves.begin(), rookMoves.end());
     return moves;
 }
