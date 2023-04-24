@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     char boardInitState[64]  = {    
         'R','N','B','K','Q','B','N','R',
-        ' ','P','P','P','P','P','P','P',
+        'P','P','P','P','P','P','P','P',
         ' ',' ',' ',' ',' ',' ',' ',' ',
         ' ',' ',' ',' ',' ',' ',' ',' ',
         ' ',' ',' ',' ',' ',' ',' ',' ',
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     board.initBoardState(boardInitState);
     initRookDB();
     system("clear");
-    vector<BitBoard> moves = generateRookMoves(board.boardState, true);
-    std::cout << moves.size() << endl;
+    vector<BitBoard> moves = generateMoves(board.boardState, true);
+    generate_sliding_piece_masks();
     deleteRookDB();
 }

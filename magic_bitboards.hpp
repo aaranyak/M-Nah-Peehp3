@@ -1,6 +1,7 @@
 #include "sliding_piece_magics.hpp"
 
 U64* rookMagicDB[64]; /* Lookup Table for rook attacks */
+U64* bishopMagicDB[64]; /* Lookup Table for rook attacks */
 
 U64 slowRookGeneration(int square, U64 blockers) {
     // Initialize rook moves for magic bitboard tables.
