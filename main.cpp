@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     char boardInitState[64]  = {    
         'R','N','B','K','Q','B','N','R',
-        ' ','P','P','P','P','P','P','P',
+        'P','P','P','P','p','P','P','P',
         ' ',' ',' ',' ',' ',' ',' ',' ',
         ' ',' ',' ',' ',' ',' ',' ',' ',
         ' ',' ',' ',' ',' ',' ',' ',' ',
@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
     initRookDB();
     initBishopDB();
     system("clear");
-    int count = CountMoves(board.boardState, 6, true);
-    std::cout << count << endl;
+    std::cout << CountMoves(board.boardState, 6,true) << endl;
     deleteRookDB();
-    deleteBishopDB();
+    deleteBishopDB();\
+    return 0;
 }

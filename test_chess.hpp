@@ -1,4 +1,4 @@
-#include "generate_moves.hpp"
+#include "chess_functions.hpp"
 #include <string>
 #include <iostream>
 #include <cstdlib>
@@ -9,7 +9,12 @@ int CountMoves(BitBoard board, int depth, bool team) {
         int count = 0;
         for (auto &&position : moves)
         {
-            count += CountMoves(position, depth - 1, !team);
+            if (!isCheck(position, team)) {
+                count += CountMoves(position, depth - 1, !team);
+            }
+            else {
+                std::cout << "Check!" << endl;
+            }
         }
         return count;
     }
