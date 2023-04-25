@@ -1,10 +1,11 @@
-#include "chess_functions.hpp"
+#include "search.hpp"
 #include <string>
 #include <iostream>
 #include <cstdlib>
 
 int CountMoves(BitBoard board, int depth, bool team) {
     if (depth){
+        Board renderer;
         vector<BitBoard> moves = generateMoves(board, team);
         int count = 0;
         for (auto &&position : moves)

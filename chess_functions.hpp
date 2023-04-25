@@ -56,3 +56,11 @@ struct SearchResult {
     int score;
     BitBoard boardState;
 }
+
+SearchResult searchResult(int score, BitBoard boardState) {
+    // Return searchResult with given parameters.
+    SearchResult result;
+    result.score = score;
+    result.boardState = boardState;
+    return result;
+}

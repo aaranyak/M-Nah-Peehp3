@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     char boardInitState[64]  = {    
         'R','N','B','K','Q','B','N','R',
-        'P','P','P','P','p','P','P','P',
+        'P','P','P','P','P','P','P','P',
         ' ',' ',' ',' ',' ',' ',' ',' ',
         ' ',' ',' ',' ',' ',' ',' ',' ',
         ' ',' ',' ',' ',' ',' ',' ',' ',
@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     initRookDB();
     initBishopDB();
     system("clear");
-    std::cout << CountMoves(board.boardState, 6,true) << endl;
+    SearchResult move = PlainSearch(board.boardState, 3, true);
     deleteRookDB();
     deleteBishopDB();\
     return 0;
