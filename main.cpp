@@ -20,7 +20,13 @@ int main(int argc, char *argv[])
     initRookDB();
     initBishopDB();
     system("clear");
-    SearchResult move = PlainSearch(board.boardState, 3, true);
+    auto start = high_resolution_clock::now();
+    SearchResult move = Search(board.boardState, 8, true, N_INF, P_INF);
+    auto stop = high_resolution_clock::now();
+    board.boardState = move.boardState;
+    renderBoard(board);
+    std::cout << "With a score of: " << move.score << endl;
+    std::cout << "Took " << duration_cast<seconds>(stop - start).count() << " seconds to search a depth of 8." << endl;
     deleteRookDB();
     deleteBishopDB();\
     return 0;

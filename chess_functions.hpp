@@ -55,7 +55,7 @@ int staticEval(BitBoard board, bool team) {
 struct SearchResult {
     int score;
     BitBoard boardState;
-}
+};
 
 SearchResult searchResult(int score, BitBoard boardState) {
     // Return searchResult with given parameters.

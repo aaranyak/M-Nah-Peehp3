@@ -1,6 +1,7 @@
 #include <vector>
 #include "magic_bitboards.hpp"
 using namespace std;
+// #define PAWN_PROMOTION
 vector<BitBoard> generateKnightMoves(BitBoard board, bool team) {
     // Generates all the resulting board states by moving the knight.
     vector<BitBoard> retVal  {};
@@ -206,6 +207,7 @@ vector<BitBoard> generatePawnMoves(BitBoard board, bool team) {
                 pawnMoves &= ~move; /* Update the remaining moves */
             }
             lastValue &= ~isolatedLSB; /* Update remaining pieces */
+            #ifdef PAWN_PROMOTION
             // Check for pawn promotion
             U64 forward_move = (isolatedLSB >> 8) & ~(ownTeamMask | opponentTeamMask); /* Pawn Forward Move */
             if (forward_move & ranksLookup[0]) { /* If pawn is on last square */
@@ -215,6 +217,7 @@ vector<BitBoard> generatePawnMoves(BitBoard board, bool team) {
                 vector<BitBoard> pawnPromotions = pawnPromotion(movedPawn, team, forward_move); /* Create Promotion Options */
                 retVal.insert(retVal.end(), pawnPromotions.begin(), pawnPromotions.end()); /* Add them to list */
             }
+            #endif
         }
         
     }
