@@ -3,6 +3,7 @@
 #include <chrono>
 #include <vector>
 using namespace std::chrono;
+#define DEPTH 4
 int main(int argc, char *argv[])
 {
     char boardInitState[64]  = {    
@@ -21,13 +22,13 @@ int main(int argc, char *argv[])
     initBishopDB();
     system("clear");
     auto start = high_resolution_clock::now();
-    SearchResult move = Search(board.boardState, 8, true, N_INF, P_INF);
+    SearchResult move = Search(board.boardState, DEPTH, true, N_INF, P_INF);
     auto stop = high_resolution_clock::now();
     board.boardState = move.boardState;
     renderBoard(board);
     std::cout << "With a score of: " << move.score << endl;
-    std::cout << "Took " << duration_cast<seconds>(stop - start).count() << " seconds to search a depth of 8." << endl;
+    std::cout << "Took " << duration_cast<seconds>(stop - start).count() << " seconds to search a depth of " << DEPTH << "."<< endl;
     deleteRookDB();
-    deleteBishopDB();\
+    deleteBishopDB();
     return 0;
 }
