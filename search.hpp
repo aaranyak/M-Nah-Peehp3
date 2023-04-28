@@ -87,36 +87,8 @@ SearchResult Search(BitBoard board, int depth, bool team, int alpha, int beta) {
     else { /* If at end of search */
         depth = 0;
         return searchResult(
-            SearchAllCaptures(board, team, alpha, beta, 0),
+            staticEval(board, team);
             BB_0
         );
-    }
-}
-Board renderer;
-int SearchAllCaptures(BitBoard board, bool team, int alpha, int beta, int depth) {
-    // Search all capture moves
-    vector<BitBoard> pseudoLegalMoves = generateMoves(board, team);
-    vector<BitBoard> captures;
-    std::copy_if(pseudoLegalMoves.begin(), pseudoLegalMoves.end(), std::back_inserter(captures), [team, board](BitBoard &state) { /* Copy only legal moves to the second list */
-            return (!isCheck(state, team)) && (staticEval(board, true) != staticEval(state, true)); /* Only copy if board state is not check and the material count of both boards are different (Means piece has been captured)*/
-    });
-    if (captures.size()) { /* If there are captures remaining*/
-        int maxResult = N_INF;
-        std::cout << captures.size() << endl;
-        for (auto &&boardPosition : captures) { /* Loop through all captures */
-            int result = -SearchAllCaptures(boardPosition, !team, -beta, -alpha, depth + 1); /* Recursively call capture search */
-            if (result > maxResult) { /* If this result is greater than the last best */
-                maxResult = result; /* Update maximum */
-            }
-            if (result > beta) return beta; /* If current move is better than last best move, prune */
-            else {
-                alpha = max(result, alpha); /* Update best move if required*/
-            }
-        }
-        return maxResult;
-    }
-    else {
-        // std::cout << depth << endl;
-        return staticEval(board, team);
     }
 }

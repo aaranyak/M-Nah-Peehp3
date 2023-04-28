@@ -3,7 +3,7 @@
 #include <chrono>
 #include <vector>
 using namespace std::chrono;
-#define DEPTH 4
+#define DEPTH 5
 int main(int argc, char *argv[])
 {
     char boardInitState[64]  = {    
