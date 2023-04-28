@@ -87,7 +87,7 @@ SearchResult Search(BitBoard board, int depth, bool team, int alpha, int beta) {
     else { /* If at end of search */
         depth = 0;
         return searchResult(
-            staticEval(board, team);
+            staticEval(board, team),
             BB_0
         );
     }
